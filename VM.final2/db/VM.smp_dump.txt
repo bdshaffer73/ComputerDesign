@@ -1,9 +1,0 @@
-
-State Machine - |VM|CONTROL:ct|State
-Name State.MV State.UPDATE State.DECODE State.FETCH State.INPUT State.RUN 
-State.INPUT 0 0 0 0 0 0 
-State.FETCH 0 0 0 1 1 0 
-State.DECODE 0 0 1 0 1 0 
-State.UPDATE 0 1 0 0 1 0 
-State.MV 1 0 0 0 1 0 
-State.RUN 0 0 0 0 1 1 
