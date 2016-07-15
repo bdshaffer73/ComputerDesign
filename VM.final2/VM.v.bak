@@ -1,0 +1,9 @@
+module test(in, out, clk, rst);
+
+input in, clk, rst;
+output out;
+
+if(clk)
+assign out = in;
+
+endmodule

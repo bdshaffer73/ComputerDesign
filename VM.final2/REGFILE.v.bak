@@ -1,0 +1,241 @@
+module REGFILE(in, out0, out1, addr0, addr1, rw, clk, rst);
+
+input [31:0]in;
+input [15:0]addr0, addr1;
+input rw; //Read on 0, Write on 1
+input clk, rst;
+
+output [31:0]out0, out1;
+
+reg [31:0]out;
+reg [31:0]out0, out1;
+
+//Declare registers
+REG register[15:0] (rw, in, out, clk, rst); 
+
+//Read from registers. Reading is combinational, so no sequential block necessary.
+always @(*)
+begin
+	case(addr0)
+		
+		16'd0: begin	
+			out0 = register[0];
+		end
+		
+		16'd1: begin	
+			out0 = register[1];
+		end	
+
+		16'd2: begin	
+			out0 = register[2];
+		end
+
+		16'd3: begin	
+			out0 = register[3];
+		end
+		
+		16'd4: begin	
+			out0 = register[4];
+		end
+
+		16'd5: begin	
+			out0 = register[5];
+		end
+
+		16'd6: begin	
+			out0 = register[6];
+		end
+
+		16'd7: begin	
+			out0 = register[7];
+		end
+
+		16'd8: begin	
+			out0 = register[8];
+		end
+
+		16'd9: begin	
+			out0 = register[9];
+		end
+
+		16'd10: begin	
+			out0 = register[10];
+		end
+
+		16'd11: begin	
+			out0 = register[11];
+		end
+
+		16'd12: begin	
+			out0 = register[12];
+		end
+
+		16'd13: begin	
+			out0 = register[13];
+		end
+
+		16'd14: begin	
+			out0 = register[14];
+		end
+	
+		16'd15: begin	
+			out0 = register[15];
+		end
+		
+		default: begin
+			out0 = out0;
+		end
+	endcase
+	
+	case(addr1)
+		
+		16'd0: begin	
+			out1 = register[0];
+		end
+		
+		16'd1: begin	
+			out1 = register[1];
+		end	
+
+		16'd2: begin	
+			out1 = register[2];
+		end
+
+		16'd3: begin	
+			out1 = register[3];
+		end
+		
+		16'd4: begin	
+			out1 = register[4];
+		end
+
+		16'd5: begin	
+			out1 = register[5];
+		end
+
+		16'd6: begin	
+			out1 = register[6];
+		end
+
+		16'd7: begin	
+			out1 = register[7];
+		end
+
+		16'd8: begin	
+			out1 = register[8];
+		end
+
+		16'd9: begin	
+			out1 = register[9];
+		end
+
+		16'd10: begin	
+			out1 = register[10];
+		end
+
+		16'd11: begin	
+			out1 = register[11];
+		end
+
+		16'd12: begin	
+			out1 = register[12];
+		end
+
+		16'd13: begin	
+			out1 = register[13];
+		end
+
+		16'd14: begin	
+			out1 = register[14];
+		end
+	
+		16'd15: begin	
+			out1 = register[15];
+		end
+		
+		default: begin
+			out1 = out1;
+		end
+		endcase
+		
+end
+
+//Writing is sequential, so no combinational blocks.
+always @(posedge clk or negedge rst)
+begin
+	if(rst == 1'd0)
+		register[15:0] <= rst;
+	else begin
+		 if (rw == 1'd1) begin
+			case(addr0)
+
+				16'd0: begin
+					register[0] <= in;
+				end
+			
+				16'd1: begin
+					register[1] <= in;
+				end		
+				
+				16'd2: begin
+					register[2] <= in;
+				end		
+					
+				16'd3: begin
+					register[3] <= in;
+				end		
+						
+				16'd4: begin
+					register[4] <= in;
+				end		
+							
+				16'd5: begin
+					register[5] <= in;
+				end		
+								
+				16'd6: begin
+					register[6] <= in;
+				end		
+								
+				16'd7: begin
+					register[7] <= in;
+				end		
+								
+				16'd8: begin
+					register[8] <= in;
+				end		
+								
+				16'd9: begin
+					register[9] <= in;
+				end		
+								
+				16'd10: begin
+					register[10] <= in;
+				end		
+								
+				16'd11: begin
+					register[11] <= in;
+				end		
+								
+				16'd12: begin
+					register[12] <= in;
+				end		
+								
+				16'd13: begin
+					register[13] <= in;
+				end		
+				
+				16'd14: begin
+					register[14] <= in;
+				end		
+				
+				16'd15: begin
+					register[15] <= in;
+				end		
+				
+				default;
+			endcase
+		end
+	end
+end
+endmodule

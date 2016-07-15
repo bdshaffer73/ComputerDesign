@@ -1,0 +1,188 @@
+module CONTROL (in, clk, rst, out);
+
+input [16:0]in;
+input clk, rst;
+output 
+
+wire [31:0]ARcarry;
+reg memrw;
+reg memin;
+wire memout;
+reg [31:0]memaddr;
+reg memaddrs;
+wire regi;
+wire [1:0]regs;
+reg pcrw;
+reg pcin;
+wire pcout;
+reg pcs;
+wire bpc;
+reg regin;
+reg regins;
+reg reginc;
+reg regrw;
+reg regaddr0;
+reg regaddr1;
+reg regout0;
+reg regout1;
+//wire statupd8;
+reg [7:0]aluinst;
+wire [31:0]aluA;
+wire [31:0]aluB;
+wire [31:0]aluO;
+wire statupd8;
+reg [7:0] inst;
+
+ALU alu (aluinst, aluA, aluB, aluO, statupd8);
+
+REGFILE regfile (regin, regout0, regout1, regaddr0, regaddr1, regrw, clk, rst);
+
+REGFILE mem (memin, memout, memout, memaddr, memaddr, memrw, clk, rst);
+
+REG pc (pcrw, pcin, pcout, clk, rst);
+
+reg [3:0]State, NState;
+
+parameter ADD = 8'd2,
+	SUB = 8'd3,
+	MEMW = 8'd4,
+	MEMR = 8'd5, 
+	CP = 8'd6,
+	MV = 8'd7,
+	BEQ = 8'd0,
+	BLT = 8'd1;
+
+parameter FETCH = 3'd0,
+	DECODE = 3'd1,
+	EXECUTE = 3'd2,
+	UPDATE = 3'd3,
+	INPUT = 3'd4;
+
+always @(posedge clk or negedge rst)
+begin
+if(rst == 1'd0) begin
+	State <= INPUT;
+end
+else begin
+	State <= NState;
+end
+end
+
+//Finite State Machine
+always @(*) begin
+case(State)
+
+	FETCH: begin
+		NState = DECODE;
+	end
+
+	DECODE: begin
+		NState = EXECUTE;
+	end
+	
+	EXECUTE: begin
+		NState = UPDATE;
+	end
+
+	UPDATE: begin
+		NState = FETCH;
+	end
+
+	default: begin
+	end
+endcase
+end
+
+reg [31:0]instFetch;
+
+always @(posedge clk or negedge rst) begin
+
+if(rst == 1'd0) begin
+
+pcin <= 32'd0;
+pcrw <= 1'd1;
+regins <= 2'd1;
+reginc <= 32'd0;
+regaddr0 <= 32'd0;
+regaddr1 <= 32'd0;
+regrw <= 1'd0;
+memin <= 32'd0;
+memaddrs <= 1'd0;
+aluinst <= 8'd0;
+
+end
+else begin
+
+case(State)
+	
+	FETCH: begin
+		regrw <= 1'd0;
+		memaddr <= pcout;
+		memrw <= 1'd0;
+		instFetch <= memout;
+	end
+
+	DECODE: begin
+		inst <= instFetch[31:24];
+		if (inst == MV) begin
+			regaddr1 <= instFetch[23:16];
+			regaddr0 <= instFetch[15:8];
+		end 
+	end
+
+	EXECUTE: begin
+		if(inst == MV) begin
+			regrw <= 1'd1;
+		end
+	end
+
+	UPDATE: begin
+		if(inst == MV)
+			pcs <= 1'd0;
+			pcin <= pcout + 1;
+	end
+
+endcase
+
+end
+
+end
+
+//MUXes
+always @(*) begin
+
+/**/
+case(memaddrs)//Mem address switch
+
+1'd0: begin //Pass-through the pc as usual
+memaddr = pcout;
+end
+
+1'd1: begin //Pass-through the register for a specific memory allocation
+memaddr = regout0;
+end
+endcase
+
+/**/
+case(regins)//RegFile input switch
+
+2'd0: begin //Input the ALU mathematical output
+regin = aluO;
+end
+
+2'd1: begin //Input a special value from the Control
+regin = reginc;
+end
+
+2'd2: begin //Input the memory output
+regin = memout;
+end
+
+2'd3: begin //Input the RegFile secondary output
+regin = regout1;
+end
+endcase
+
+end
+
+endmodule
